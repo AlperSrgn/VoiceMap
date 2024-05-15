@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">VoiceToMap</string>
+    <string name="google_map_api_key">AIzaSyDNtg1nrAqyCpy3OHeDpfiovpyhgIOGeko</string>
+</resources>
