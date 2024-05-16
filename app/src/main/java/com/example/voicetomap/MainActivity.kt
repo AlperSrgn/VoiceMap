@@ -7,6 +7,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -20,6 +23,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private lateinit var mGoogleMap: GoogleMap
     private lateinit var lastLocation: Location
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var locationCallback: LocationCallback
+    private lateinit var locationRequest: LocationRequest
 
     companion object{
         private const val LOCATION_REQUEST_CODE = 1
@@ -35,6 +40,25 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
+        locationRequest = LocationRequest.create().apply {
+            interval = 1000 // 1 second delay
+            fastestInterval = 500 // 0.5 second delay
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                super.onLocationResult(locationResult)
+                for (location in locationResult.locations){
+                    if (location != null) {
+                        mGoogleMap.clear()
+                        val current_Lat_Long = LatLng(location.latitude, location.longitude)
+                        placeMarkerOnMap(current_Lat_Long)
+                        mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(current_Lat_Long))
+                    }
+                }
+            }
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -51,15 +75,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             return
         }
         mGoogleMap.isMyLocationEnabled = true
-        fusedLocationClient.lastLocation.addOnSuccessListener(this){ location ->
-
-            if(location!= null){
-                lastLocation = location
-                val current_Lat_Long = LatLng(location.latitude, location.longitude)
-                placeMarkerOnMap(current_Lat_Long)
-                mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(current_Lat_Long, 10f))
-            }
-        }
+        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null /* Looper */)
     }
 
     private fun placeMarkerOnMap(current_Lat_Long: LatLng) {
