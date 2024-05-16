@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import android.speech.tts.TextToSpeech
 import android.view.MotionEvent
 import android.widget.Button
 import android.widget.EditText
@@ -62,6 +63,13 @@ class SpeechToText : AppCompatActivity() {
                 micBtn!!.setImageResource(R.drawable.ic_mic_green)
                 val data = bundle!!.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                 editText!!.setText(data!![0])
+
+                // "EV" KELİME KONTROLÜ
+                if (data[0].contains("ev")) {
+                    val text = "Ev konumu için rota oluşturuldu."
+                    tts.speak(text, TextToSpeech.QUEUE_FLUSH, null)
+                    showMapBtn?.performClick()
+                }
             }
 
             override fun onPartialResults(p0: Bundle?) {
@@ -71,6 +79,9 @@ class SpeechToText : AppCompatActivity() {
             override fun onEvent(p0: Int, p1: Bundle?) {
                 TODO("Not yet implemented")
             }
+
+            // TextToSpeech
+            var tts = TextToSpeech(applicationContext) { status -> if (status != TextToSpeech.ERROR) { } }
 
         })
 
