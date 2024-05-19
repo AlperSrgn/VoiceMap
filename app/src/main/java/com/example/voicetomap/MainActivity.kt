@@ -54,11 +54,24 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                         mGoogleMap.clear()
                         val current_Lat_Long = LatLng(location.latitude, location.longitude)
                         placeMarkerOnMap(current_Lat_Long)
+
+                        // Söylenen kelimeye göre hangi konumun işaretleneceğinin kontrolü
+                        val command = intent.getStringExtra("command")
+                        if (command == "ev") {
+                            val home_Lat_Long = LatLng(41.0082, 28.9784) // Ev kelimesine ait konum
+                            placeMarkerOnMap(home_Lat_Long)
+                        } else if (command == "araba") {
+                            val car_Lat_Long = LatLng(41.3082, 29.7784) // Araba kelimesine ait konum
+                            placeMarkerOnMap(car_Lat_Long)
+                        }
+
                         mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(current_Lat_Long))
                     }
                 }
             }
         }
+
+
     }
 
     override fun onMapReady(googleMap: GoogleMap) {

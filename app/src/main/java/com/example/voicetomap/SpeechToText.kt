@@ -34,10 +34,11 @@ class SpeechToText : AppCompatActivity() {
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
         showMapBtn = findViewById(R.id.ShowMap)
 
+        //Buton iptal edildiğinde bu kodlar silinecek
         showMapBtn?.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
-        }
+        }//Buton iptal edildiğinde bu kodlar silinecek
 
         val speechRecognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
         speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
@@ -69,8 +70,25 @@ class SpeechToText : AppCompatActivity() {
                     val text = "Ev konumu için rota oluşturuldu."
                     tts.speak(text, TextToSpeech.QUEUE_FLUSH, null)
                     showMapBtn?.performClick()
+
+                    // Haritaya "ev" kelimesini gönderme
+                    val intent = Intent(this@SpeechToText, MainActivity::class.java)
+                    intent.putExtra("command", "ev") // Söylenen kelime
+                    startActivity(intent)
+                }
+                // "ARABA" KELİME KONTROLÜ
+                else if (data[0].contains("araba")) {
+                    val text = "Araba konumu için rota oluşturuldu."
+                    tts.speak(text, TextToSpeech.QUEUE_FLUSH, null)
+                    showMapBtn?.performClick()
+
+                    // Haritaya "araba" kelimesini gönderme
+                    val intent = Intent(this@SpeechToText, MainActivity::class.java)
+                    intent.putExtra("command", "araba") // Söylenen kelime
+                    startActivity(intent)
                 }
             }
+
 
             override fun onPartialResults(p0: Bundle?) {
                 TODO("Not yet implemented")
