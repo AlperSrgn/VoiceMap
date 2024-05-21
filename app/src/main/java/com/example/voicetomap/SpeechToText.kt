@@ -1,5 +1,6 @@
 package com.example.voicetomap
 
+
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -24,6 +25,7 @@ class SpeechToText : AppCompatActivity() {
     private var editText: EditText? = null
     private var micBtn: ImageView? = null
     private var showMapBtn: Button? = null
+    private var btnCamera: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,12 +35,19 @@ class SpeechToText : AppCompatActivity() {
         micBtn = findViewById(R.id.ImageView)
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
         showMapBtn = findViewById(R.id.ShowMap)
+        btnCamera = findViewById(R.id.buttonCamera)
 
         //Buton iptal edildiğinde bu kodlar silinecek
         showMapBtn?.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }//Buton iptal edildiğinde bu kodlar silinecek
+
+
+        btnCamera?.setOnClickListener {
+            val intent = Intent(this, ObjectDetection::class.java)
+            startActivity(intent)
+        }
 
         val speechRecognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
         speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
