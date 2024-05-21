@@ -35,8 +35,8 @@ import org.tensorflow.lite.support.image.ops.ResizeOp
 class ObjectDetection : AppCompatActivity() {
 
     var colors = listOf<Int>(
-        Color.BLUE, Color.GREEN, Color.RED, Color.CYAN, Color.GRAY, Color.BLACK, Color.YELLOW
-    )
+        Color.BLUE, Color.GREEN, Color.RED, Color.CYAN, Color.GRAY, Color.BLACK,
+        Color.DKGRAY, Color.MAGENTA, Color.YELLOW, Color.RED)
 
     lateinit var labels: List<String>
 
