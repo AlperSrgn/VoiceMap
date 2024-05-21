@@ -60,8 +60,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                         if (command == "ev") {
                             val home_Lat_Long = LatLng(41.0082, 28.9784) // Ev kelimesine ait konum
                             placeMarkerOnMap(home_Lat_Long)
-                        } else if (command == "araba") {
-                            val car_Lat_Long = LatLng(41.3082, 29.7784) // Araba kelimesine ait konum
+                        } else if (command == "okul") {
+                            val car_Lat_Long = LatLng(40.82348954171715, 29.92532549420805) // Okul kelimesine ait konum
                             placeMarkerOnMap(car_Lat_Long)
                         }
 

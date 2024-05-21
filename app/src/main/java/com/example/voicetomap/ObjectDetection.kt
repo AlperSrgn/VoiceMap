@@ -13,9 +13,9 @@ import android.hardware.camera2.CameraCaptureSession
 import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraManager
 import android.os.Bundle
-import android.os.FileUtils
 import android.os.Handler
 import android.os.HandlerThread
+import android.speech.tts.TextToSpeech
 import android.view.Surface
 import android.view.TextureView
 import android.widget.ImageView
@@ -30,7 +30,7 @@ import org.tensorflow.lite.support.common.FileUtil
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
-
+import java.util.*
 
 class ObjectDetection : AppCompatActivity() {
 
@@ -39,6 +39,8 @@ class ObjectDetection : AppCompatActivity() {
         Color.DKGRAY, Color.MAGENTA, Color.YELLOW, Color.RED)
 
     lateinit var labels: List<String>
+    lateinit var tts: TextToSpeech
+    var lastSpokenObject: String? = null
 
     lateinit var handler: Handler
     lateinit var cameraDevice: CameraDevice
@@ -60,7 +62,6 @@ class ObjectDetection : AppCompatActivity() {
             insets
         }
 
-
         get_permission()
 
         labels = FileUtil.loadLabels(this, "labels.txt")
@@ -74,6 +75,12 @@ class ObjectDetection : AppCompatActivity() {
 
         imageView = this.findViewById(R.id.ImageView)
         textureView = findViewById(R.id.textureView)
+
+        tts = TextToSpeech(this) { status ->
+            if (status != TextToSpeech.ERROR) {
+                tts.language = Locale.US
+            }
+        }
 
         textureView.surfaceTextureListener = object : TextureView.SurfaceTextureListener{
             override fun onSurfaceTextureAvailable(p0: SurfaceTexture, p1: Int, p2: Int) {
@@ -91,17 +98,14 @@ class ObjectDetection : AppCompatActivity() {
             override fun onSurfaceTextureUpdated(p0: SurfaceTexture) {
                 bitmap = textureView.bitmap!!
 
-
                 var image = TensorImage.fromBitmap(bitmap)
                 image = imageProcessor.process(image)
-
 
                 val outputs = model.process(image)
                 val locations = outputs.locationsAsTensorBuffer.floatArray
                 val classes = outputs.classesAsTensorBuffer.floatArray
                 val scores = outputs.scoresAsTensorBuffer.floatArray
                 val numberOfDetections = outputs.numberOfDetectionsAsTensorBuffer.floatArray
-
 
                 var mutable = bitmap.copy(Bitmap.Config.ARGB_8888, true)
                 val canvas = Canvas(mutable)
@@ -113,6 +117,30 @@ class ObjectDetection : AppCompatActivity() {
                 paint.strokeWidth = h/85f
                 var x =0
 
+                var maxArea = 0f
+                var maxLabel: String? = null
+                var maxLocation: FloatArray? = null
+
+                scores.forEachIndexed { index, fl ->
+                    x = index
+                    x *= 4
+                    if (fl > 0.5) {
+                        val area = (locations.get(x + 3) - locations.get(x + 1)) * (locations.get(x + 2) - locations.get(x)) * w * h
+                        if (area > maxArea) {
+                            maxArea = area
+                            maxLabel = labels.get(classes.get(index).toInt())
+                            maxLocation = floatArrayOf(locations.get(x), locations.get(x+1), locations.get(x+2), locations.get(x+3))
+                        }
+                    }
+                }
+
+                if (maxLabel != null && maxLabel != lastSpokenObject) {
+                    val position = if ((maxLocation!![1] + maxLocation!![3]) / 2 < 0.5) "left" else "right"
+                    tts.speak("$maxLabel on the $position", TextToSpeech.QUEUE_FLUSH, null, "")
+                    lastSpokenObject = maxLabel
+                }
+
+                x = 0
                 scores.forEachIndexed { index, fl ->
                     x = index
                     x *= 4
@@ -121,8 +149,8 @@ class ObjectDetection : AppCompatActivity() {
                         paint.style = Paint.Style.STROKE
                         canvas.drawRect(RectF(locations.get(x + 1) * w, locations.get(x) * h, locations.get(x + 3) * w, locations.get(x + 2) * h), paint)
                         paint.style = Paint.Style.FILL
-                        canvas.drawText(labels.get(classes.get(index).toInt())+""+fl.toString(), locations.get(x+1)*w , locations.get(x)*h, paint)
-
+                        val label = labels.get(classes.get(index).toInt())
+                        canvas.drawText(label + "" + fl.toString(), locations.get(x+1)*w , locations.get(x)*h, paint)
                     }
                 }
 
@@ -139,6 +167,7 @@ class ObjectDetection : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         model.close()
+        tts.shutdown()
     }
 
     @SuppressLint("MissingPermission")

@@ -85,15 +85,15 @@ class SpeechToText : AppCompatActivity() {
                     intent.putExtra("command", "ev") // Söylenen kelime
                     startActivity(intent)
                 }
-                // "ARABA" KELİME KONTROLÜ
-                else if (data[0].contains("araba")) {
-                    val text = "Araba konumu için rota oluşturuldu."
+                // "OKUL" KELİME KONTROLÜ
+                else if (data[0].contains("okul")) {
+                    val text = "Okul konumu için rota oluşturuldu."
                     tts.speak(text, TextToSpeech.QUEUE_FLUSH, null)
                     showMapBtn?.performClick()
 
-                    // Haritaya "araba" kelimesini gönderme
+                    // Haritaya "okul" kelimesini gönderme
                     val intent = Intent(this@SpeechToText, MainActivity::class.java)
-                    intent.putExtra("command", "araba") // Söylenen kelime
+                    intent.putExtra("command", "okul") // Söylenen kelime
                     startActivity(intent)
                 }
             }
