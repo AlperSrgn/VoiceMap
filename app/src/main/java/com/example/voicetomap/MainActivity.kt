@@ -82,6 +82,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 super.onLocationResult(locationResult)
                 for (location in locationResult.locations) {
                     if (location != null) {
+                        mGoogleMap.clear()
                         val currentLatLong = LatLng(location.latitude, location.longitude)
                         placeMarkerOnMap(currentLatLong, "Mevcut Konum")
 
