@@ -45,6 +45,7 @@ dependencies {
     //Google
     implementation libs.gms.play.services.maps
     implementation libs.play.services.location
+    implementation libs.places
     implementation libs.tensorflow.lite.support
     implementation libs.tensorflow.lite.metadata
 
