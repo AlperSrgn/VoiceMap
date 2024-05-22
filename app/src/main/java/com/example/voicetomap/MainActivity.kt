@@ -4,13 +4,14 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.widget.ImageButton
+import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
+import com.example.voicetomap.R.menu
+import com.google.android.gms.common.api.Status
+import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -18,6 +19,10 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     private lateinit var mGoogleMap: GoogleMap
@@ -25,8 +30,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
     private lateinit var locationRequest: LocationRequest
+    private lateinit var autocompleteFragment: AutocompleteSupportFragment
 
-    companion object{
+    companion object {
         private const val LOCATION_REQUEST_CODE = 1
     }
 
@@ -34,9 +40,34 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.mapFragment) as SupportMapFragment
+        Places.initialize(applicationContext, getString(R.string.google_map_api_key))
+        autocompleteFragment = supportFragmentManager.findFragmentById(R.id.autocomplete_fragment) as AutocompleteSupportFragment
+        autocompleteFragment.setPlaceFields(listOf(Place.Field.ID, Place.Field.ADDRESS, Place.Field.LAT_LNG))
+        autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
+            override fun onError(p0: Status) {
+                Toast.makeText(this@MainActivity, "Aramada hatalar", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onPlaceSelected(place: Place) {
+                val latLng = place.latLng!!
+                zoomOnMap(latLng)
+            }
+        })
+
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        val mapOptionButton: ImageButton = findViewById(R.id.mapOptionsMenu)
+        val popupMenu = PopupMenu(this, mapOptionButton)
+        popupMenu.menuInflater.inflate(menu.map_options, popupMenu.menu)
+        popupMenu.setOnMenuItemClickListener { menuItem ->
+            changeMap(menuItem.itemId)
+            true
+        }
+
+        mapOptionButton.setOnClickListener {
+            popupMenu.show()
+        }
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -49,41 +80,50 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 super.onLocationResult(locationResult)
-                for (location in locationResult.locations){
+                for (location in locationResult.locations) {
                     if (location != null) {
-                        mGoogleMap.clear()
-                        val current_Lat_Long = LatLng(location.latitude, location.longitude)
-                        placeMarkerOnMap(current_Lat_Long)
+                        val currentLatLong = LatLng(location.latitude, location.longitude)
+                        placeMarkerOnMap(currentLatLong, "Mevcut Konum")
 
                         // Söylenen kelimeye göre hangi konumun işaretleneceğinin kontrolü
                         val command = intent.getStringExtra("command")
                         if (command == "ev") {
-                            val home_Lat_Long = LatLng(41.0082, 28.9784) // Ev kelimesine ait konum
-                            placeMarkerOnMap(home_Lat_Long)
+                            val homeLatLong = LatLng(41.0082, 28.9784) // Ev kelimesine ait konum
+                            placeMarkerOnMap(homeLatLong, "Ev")
                         } else if (command == "okul") {
-                            val car_Lat_Long = LatLng(40.82348954171715, 29.92532549420805) // Okul kelimesine ait konum
-                            placeMarkerOnMap(car_Lat_Long)
+                            val schoolLatLong = LatLng(40.82348954171715, 29.92532549420805) // Okul kelimesine ait konum
+                            placeMarkerOnMap(schoolLatLong, "Okul")
                         }
-
-                        mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(current_Lat_Long))
                     }
                 }
             }
         }
-
-
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mGoogleMap = googleMap
         mGoogleMap.uiSettings.isZoomControlsEnabled = true
-        mGoogleMap.setOnMarkerClickListener ( this )
+        mGoogleMap.setOnMarkerClickListener(this)
         setUpMap()
     }
 
+    private fun changeMap(itemId: Int) {
+        when (itemId) {
+            R.id.normal_map -> mGoogleMap.mapType = GoogleMap.MAP_TYPE_NORMAL
+            R.id.hybrid_map_map -> mGoogleMap.mapType = GoogleMap.MAP_TYPE_HYBRID
+            R.id.satallite_map -> mGoogleMap.mapType = GoogleMap.MAP_TYPE_SATELLITE
+            R.id.terrain_map -> mGoogleMap.mapType = GoogleMap.MAP_TYPE_TERRAIN
+        }
+    }
+
+    private fun zoomOnMap(latLng: LatLng) {
+        val newLatLngZoom = CameraUpdateFactory.newLatLngZoom(latLng, 12f)
+        mGoogleMap.animateCamera(newLatLngZoom)
+        placeMarkerOnMap(latLng, "Aranan Konum")
+    }
+
     private fun setUpMap() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-        {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_REQUEST_CODE)
             return
         }
@@ -91,9 +131,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null /* Looper */)
     }
 
-    private fun placeMarkerOnMap(current_Lat_Long: LatLng) {
-        val markerOptions = MarkerOptions().position(current_Lat_Long)
-        markerOptions.title("$current_Lat_Long")
+    private fun placeMarkerOnMap(latLng: LatLng, title: String) {
+        val markerOptions = MarkerOptions().position(latLng).title(title)
         mGoogleMap.addMarker(markerOptions)
     }
 
