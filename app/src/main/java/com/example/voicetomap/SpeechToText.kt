@@ -72,7 +72,9 @@ class SpeechToText : AppCompatActivity() {
             override fun onResults(bundle: Bundle?) {
                 micBtn!!.setImageResource(R.drawable.ic_mic_green)
                 val data = bundle!!.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                editText!!.setText(data!![0])
+                //editText!!.setText(data!![0])
+                val recognizedText = data!![0].toLowerCase(Locale.getDefault())
+                editText!!.setText(recognizedText)
 
                 // "EV" KELİME KONTROLÜ
                 if (data[0].contains("ev")) {
