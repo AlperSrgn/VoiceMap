@@ -66,22 +66,48 @@
         app:layout_constraintVertical_bias="0.938" />
 
     <androidx.cardview.widget.CardView
-        android:layout_width="0dp"
+        android:id="@+id/cardView"
+        android:layout_width="200dp"
         android:layout_height="50dp"
-        app:cardCornerRadius="30dp"
-        android:layout_marginTop="10dp"
         android:layout_marginStart="20dp"
-        android:layout_marginEnd="10dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="10dp"
+        app:cardCornerRadius="30dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/mapOptionsMenu"
-        >
-       <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/autocomplete_fragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"/>
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/autocomplete_fragment"
+            android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </androidx.cardview.widget.CardView>
+
+    <ImageButton
+        android:id="@+id/micOptionsMenu"
+        android:layout_width="40dp"
+        android:layout_height="34dp"
+        android:background="@null"
+        android:contentDescription="Image"
+        android:scaleType="fitXY"
+        android:src="@drawable/baseline_mic_24"
+        android:translationZ="1dp"
+        app:layout_constraintBottom_toBottomOf="@+id/Menu2"
+        app:layout_constraintEnd_toEndOf="@+id/Menu2"
+        app:layout_constraintStart_toStartOf="@+id/Menu2"
+        app:layout_constraintTop_toTopOf="@+id/Menu2" />
+
+    <ImageButton
+        android:id="@+id/Menu2"
+        android:layout_width="41dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="128dp"
+        android:background="@null"
+        android:contentDescription="Image"
+        android:scaleType="fitXY"
+        android:src="@drawable/search_border"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
