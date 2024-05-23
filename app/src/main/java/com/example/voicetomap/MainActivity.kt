@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         autocompleteFragment.setPlaceFields(listOf(Place.Field.ID, Place.Field.ADDRESS, Place.Field.LAT_LNG))
         autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
             override fun onError(p0: Status) {
-                Toast.makeText(this@MainActivity, "Aramada hatalar", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this@MainActivity, "", Toast.LENGTH_SHORT).show()
             }
 
             override fun onPlaceSelected(place: Place) {
@@ -84,25 +84,28 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 super.onLocationResult(locationResult)
-                for (location in locationResult.locations) {
+                for (location in locationResult.locations){
                     if (location != null) {
-                        mGoogleMap.clear()
-                        val currentLatLong = LatLng(location.latitude, location.longitude)
-                        placeMarkerOnMap(currentLatLong)
+                        //mGoogleMap.clear()
+                        val current_Lat_Long = LatLng(location.latitude, location.longitude)
+                        //placeMarkerOnMap(current_Lat_Long)
 
                         // Söylenen kelimeye göre hangi konumun işaretleneceğinin kontrolü
                         val command = intent.getStringExtra("command")
                         if (command == "ev") {
-                            val markerLocation = LatLng(41.0082, 28.9784) // Ev kelimesine ait konum
+                            markerLocation = LatLng(41.0082, 28.9784) // Ev kelimesine ait konum
                             placeMarkerOnMap(markerLocation)
                         } else if (command == "okul") {
-                            val markerLocation = LatLng(40.82348954171715, 29.92532549420805) // Okul kelimesine ait konum
+                            markerLocation = LatLng(40.82348954171715, 29.92532549420805) // Okul kelimesine ait konum
                             placeMarkerOnMap(markerLocation)
                         }
+
+                        //mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(current_Lat_Long))
                     }
                 }
             }
         }
+
         val startNavigationButton = findViewById<Button>(R.id.startNavigationButton)
         startNavigationButton.setOnClickListener {
             startNavigation(markerLocation)
@@ -122,7 +125,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         } else {
             Toast.makeText(this, "Google Haritalar uygulaması bulunamadı.", Toast.LENGTH_SHORT).show()
         }
-
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
