@@ -65,6 +65,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
             override fun onPlaceSelected(place: Place) {
                 val latLng = place.latLng!!
+                markerLocation = latLng // Seçilen konumu markerLocation'a ata
                 zoomOnMap(latLng)
             }
         })
@@ -120,7 +121,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         val startNavigationButton = findViewById<Button>(R.id.startNavigationButton)
         startNavigationButton.setOnClickListener {
             vibration(it)
-            startNavigation(markerLocation)
+            if (::markerLocation.isInitialized) {
+                startNavigation(markerLocation)
+            } else {
+                Toast.makeText(this, "Lütfen bir konum seçin.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -177,3 +182,4 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     override fun onMarkerClick(p0: Marker) = false
 }
+
