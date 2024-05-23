@@ -1,9 +1,12 @@
 package com.example.voicetomap
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.net.Uri
 import android.os.Bundle
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.PopupMenu
 import android.widget.Toast
@@ -31,6 +34,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private lateinit var locationCallback: LocationCallback
     private lateinit var locationRequest: LocationRequest
     private lateinit var autocompleteFragment: AutocompleteSupportFragment
+    private lateinit var markerLocation: LatLng
 
     companion object {
         private const val LOCATION_REQUEST_CODE = 1
@@ -84,21 +88,41 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     if (location != null) {
                         mGoogleMap.clear()
                         val currentLatLong = LatLng(location.latitude, location.longitude)
-                        placeMarkerOnMap(currentLatLong, "Mevcut Konum")
+                        placeMarkerOnMap(currentLatLong)
 
                         // Söylenen kelimeye göre hangi konumun işaretleneceğinin kontrolü
                         val command = intent.getStringExtra("command")
                         if (command == "ev") {
-                            val homeLatLong = LatLng(41.0082, 28.9784) // Ev kelimesine ait konum
-                            placeMarkerOnMap(homeLatLong, "Ev")
+                            val markerLocation = LatLng(41.0082, 28.9784) // Ev kelimesine ait konum
+                            placeMarkerOnMap(markerLocation)
                         } else if (command == "okul") {
-                            val schoolLatLong = LatLng(40.82348954171715, 29.92532549420805) // Okul kelimesine ait konum
-                            placeMarkerOnMap(schoolLatLong, "Okul")
+                            val markerLocation = LatLng(40.82348954171715, 29.92532549420805) // Okul kelimesine ait konum
+                            placeMarkerOnMap(markerLocation)
                         }
                     }
                 }
             }
         }
+        val startNavigationButton = findViewById<Button>(R.id.startNavigationButton)
+        startNavigationButton.setOnClickListener {
+            startNavigation(markerLocation)
+        }
+    }
+
+    private fun startNavigation(location: LatLng) {
+        val gmmIntentUri = Uri.parse("google.navigation:q=${location.latitude},${location.longitude}")
+        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+        mapIntent.setPackage("com.google.android.apps.maps")
+        if (mapIntent.resolveActivity(packageManager) != null) {
+            try {
+                startActivity(mapIntent)
+            } catch (e: Exception) {
+                Toast.makeText(this, "Google Haritalar uygulaması açılamadı: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        } else {
+            Toast.makeText(this, "Google Haritalar uygulaması bulunamadı.", Toast.LENGTH_SHORT).show()
+        }
+
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -120,7 +144,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private fun zoomOnMap(latLng: LatLng) {
         val newLatLngZoom = CameraUpdateFactory.newLatLngZoom(latLng, 12f)
         mGoogleMap.animateCamera(newLatLngZoom)
-        placeMarkerOnMap(latLng, "Aranan Konum")
+        placeMarkerOnMap(latLng)
     }
 
     private fun setUpMap() {
@@ -132,8 +156,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null /* Looper */)
     }
 
-    private fun placeMarkerOnMap(latLng: LatLng, title: String) {
-        val markerOptions = MarkerOptions().position(latLng).title(title)
+    private fun placeMarkerOnMap(latLng: LatLng) {
+        val markerOptions = MarkerOptions().position(latLng)
         mGoogleMap.addMarker(markerOptions)
     }
 
