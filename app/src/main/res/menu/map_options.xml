@@ -3,19 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/normal_map"
-        android:title="Normal Map"
-        app:showAsAction="never"/>
+        android:title="Normal Görünüm"
+        app:showAsAction="never" />
     <item
         android:id="@+id/hybrid_map_map"
-        android:title="Hybrid Map"
-        app:showAsAction="never"/>
+        android:title="Hibrit Görünüm"
+        app:showAsAction="never" />
     <item
         android:id="@+id/satallite_map"
-        android:title="Satellite Map"
-        app:showAsAction="never"/>
+        android:title="Uydu Görünümü"
+        app:showAsAction="never" />
     <item
         android:id="@+id/terrain_map"
-        android:title="Terrain Map"
-        app:showAsAction="never"/>
+        android:title="Arazi Görünümü"
+        app:showAsAction="never" />
 
 </menu>

@@ -2,7 +2,7 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
 
-    <solid android:color="#80FFFFFF"/> <!-- Arka planı %50 opak beyaz yapar -->
+    <solid android:color="#D9FFFFFF"/> <!-- Opacity -->
 
     <stroke
         android:color="@color/white"

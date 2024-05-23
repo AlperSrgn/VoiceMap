@@ -2,14 +2,18 @@ package com.example.voicetomap
 
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.speech.tts.TextToSpeech
 import android.view.MotionEvent
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -27,6 +31,13 @@ class SpeechToText : AppCompatActivity() {
     private var showMapBtn: Button? = null
     private var btnCamera: Button? = null
 
+
+    // Vibration
+    fun vibration(v: View){
+        val vibrate = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        vibrate.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_speech_to_text)
@@ -37,17 +48,21 @@ class SpeechToText : AppCompatActivity() {
         showMapBtn = findViewById(R.id.ShowMap)
         btnCamera = findViewById(R.id.buttonCamera)
 
-        //Buton iptal edildiğinde bu kodlar silinecek
+
+        //Haritayı göster
         showMapBtn?.setOnClickListener {
+            vibration(it)
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
-        }//Buton iptal edildiğinde bu kodlar silinecek
+        }
 
-
+        //Çevreyi algıla
         btnCamera?.setOnClickListener {
+            vibration(it)
             val intent = Intent(this, ObjectDetection::class.java)
             startActivity(intent)
         }
+
 
         val speechRecognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
         speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)

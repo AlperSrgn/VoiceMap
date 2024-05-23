@@ -1,11 +1,15 @@
 package com.example.voicetomap
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.PopupMenu
@@ -35,6 +39,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private lateinit var locationRequest: LocationRequest
     private lateinit var autocompleteFragment: AutocompleteSupportFragment
     private lateinit var markerLocation: LatLng
+
+
+    // Vibration
+    fun vibration(v: View){
+        val vibrate = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        vibrate.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
+    }
 
     companion object {
         private const val LOCATION_REQUEST_CODE = 1
@@ -108,6 +119,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
         val startNavigationButton = findViewById<Button>(R.id.startNavigationButton)
         startNavigationButton.setOnClickListener {
+            vibration(it)
             startNavigation(markerLocation)
         }
     }
