@@ -37,6 +37,7 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
+import android.speech.tts.TextToSpeech
 import java.util.Locale
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
@@ -49,6 +50,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private lateinit var markerLocation: LatLng
     private lateinit var speechRecognizer: SpeechRecognizer
     private lateinit var speechRecognizerIntent: Intent
+    private lateinit var textToSpeech: TextToSpeech
 
     // Vibration
     fun vibration(v: View){
@@ -97,6 +99,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
         val micOptionButton: ImageButton = findViewById(R.id.micOptionsMenu)
         micOptionButton.setOnClickListener {
+            //textToSpeech.speak("Sizi dinliyorum.", TextToSpeech.QUEUE_FLUSH, null, "")
             startListening()
         }
 
@@ -136,13 +139,21 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             }
         }
 
+        textToSpeech = TextToSpeech(this) { status ->
+            if (status != TextToSpeech.ERROR) {
+                textToSpeech.language = Locale.getDefault()
+            }
+        }
+
         val startNavigationButton = findViewById<Button>(R.id.startNavigationButton)
         startNavigationButton.setOnClickListener {
             vibration(it)
             if (::markerLocation.isInitialized) {
+                textToSpeech.speak("Navigasyon başlatılıyor", TextToSpeech.QUEUE_FLUSH, null, "")
                 startNavigation(markerLocation)
             } else {
                 Toast.makeText(this, "Lütfen bir konum seçin.", Toast.LENGTH_SHORT).show()
+                textToSpeech.speak("Lütfen bir konum seçin.", TextToSpeech.QUEUE_FLUSH, null, "")
             }
         }
 
