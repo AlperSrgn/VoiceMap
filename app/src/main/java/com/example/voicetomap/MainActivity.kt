@@ -125,6 +125,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                         } else if (command == "okul") {
                             markerLocation = LatLng(40.82348954171715, 29.92532549420805) // Okul kelimesine ait konum
                             placeMarkerOnMap(markerLocation)
+                        } else if (command == "Durak") {
+                            markerLocation = LatLng(40.82412913625249, 29.92068944426762) // Durak kelimesine ait konum
+                            placeMarkerOnMap(markerLocation)
                         }
 
                         //mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(current_Lat_Long))
@@ -224,6 +227,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     override fun onMarkerClick(p0: Marker) = false
 }
+
 
 
 
